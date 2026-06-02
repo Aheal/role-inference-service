@@ -19,7 +19,7 @@ function App() {
   const [message, setMessage] = useState("Loading mappings...");
   const [loading, setLoading] = useState(false);
 
-  async function loadDashboard(keepSelection = false) {
+  async function loadDashboard(keepSelection = false, finalMessage?: string) {
     setLoading(true);
     setMessage("Loading roles and profiles...");
     try {
@@ -44,7 +44,7 @@ function App() {
       setRoles(nextRoles);
       setRows(nextRows);
       setSelectedUserId((current) => (keepSelection ? current ?? nextRows[0]?.profile.externalUserId ?? null : nextRows[0]?.profile.externalUserId ?? null));
-      setMessage("Ready. Select usr_006 or usr_007 to review ambiguity, then override or reset.");
+      setMessage(finalMessage ?? "Ready. Select usr_006 or usr_007 to review ambiguity, then override or reset.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to load dashboard.");
     } finally {
@@ -60,7 +60,7 @@ function App() {
   const counts = useMemo(
     () => ({
       profiles: rows.length,
-      review: rows.filter((row) => row.mapping.latestInference?.status !== "inferred").length,
+      review: rows.filter((row) => row.mapping.source !== "overridden" && row.mapping.latestInference?.status !== "inferred").length,
       overrides: rows.filter((row) => row.mapping.source === "overridden").length
     }),
     [rows]
@@ -69,15 +69,13 @@ function App() {
   async function handleOverride(userId: string, roleId: string, reason: string) {
     setMessage("Applying override...");
     await overrideMapping(userId, roleId, reason);
-    setMessage("Override applied. Mapping source is now overridden.");
-    await loadDashboard(true);
+    await loadDashboard(true, "Override applied. Mapping source is now overridden.");
   }
 
   async function handleReset(userId: string) {
     setMessage("Resetting override...");
     await resetMapping(userId);
-    setMessage("Override reset. Mapping source is now inferred.");
-    await loadDashboard(true);
+    await loadDashboard(true, "Override reset. Mapping source is now inferred.");
   }
 
   return (
@@ -163,7 +161,7 @@ function MappingDashboard({
                   <Badge value={row.mapping.source} kind="source" />
                 </td>
                 <td>
-                  <Badge value={row.mapping.latestInference?.status ?? "none"} kind="status" />
+                  <Badge value={displayStatus(row.mapping)} kind="status" />
                 </td>
                 <td>
                   <Confidence value={row.mapping.latestInference?.confidence ?? null} />
@@ -219,7 +217,8 @@ function ProfileDetails({
 
       <div className="detailsGrid">
         <Field label="Selected Role" value={mapping.selectedRole?.roleName ?? "No role selected"} />
-        <Field label="Status" value={inference?.status ?? "No inference"} />
+        <Field label="Display Status" value={displayStatus(mapping)} />
+        <Field label="Inference Status" value={inference?.status ?? "No inference"} />
         <Field label="Confidence" value={inference ? String(inference.confidence) : "n/a"} />
         <Field label="Department" value={raw.department ?? "n/a"} />
       </div>
@@ -275,6 +274,10 @@ function ProfileDetails({
 
 function Badge({ value, kind }: { value: string; kind: "source" | "status" }) {
   return <span className={`badge ${kind}_${value}`}>{value}</span>;
+}
+
+function displayStatus(mapping: CurrentMapping) {
+  return mapping.source === "overridden" ? "overridden" : mapping.latestInference?.status ?? "none";
 }
 
 function Confidence({ value }: { value: number | null }) {

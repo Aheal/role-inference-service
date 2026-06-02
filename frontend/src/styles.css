@@ -180,6 +180,12 @@ td strong,
   border-color: #fed7aa;
 }
 
+.badge.status_overridden {
+  color: #7c2d12;
+  background: #ffedd5;
+  border-color: #fed7aa;
+}
+
 .badge.status_needs_review {
   color: #854d0e;
   background: #fef3c7;
