@@ -44,7 +44,7 @@ function App() {
       setRoles(nextRoles);
       setRows(nextRows);
       setSelectedUserId((current) => (keepSelection ? current ?? nextRows[0]?.profile.externalUserId ?? null : nextRows[0]?.profile.externalUserId ?? null));
-      setMessage(finalMessage ?? "Ready. Select usr_006 or usr_007 to review ambiguity, then override or reset.");
+      setMessage(finalMessage ?? "Mappings loaded.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to load dashboard.");
     } finally {
