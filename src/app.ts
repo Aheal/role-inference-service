@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import { registerRoutes } from "./modules/routes.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -9,6 +10,7 @@ export function buildApp() {
     status: "ok"
   }));
 
+  app.register(registerRoutes);
+
   return app;
 }
-
