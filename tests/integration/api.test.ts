@@ -48,7 +48,7 @@ beforeEach(async () => {
 
 describe("profile mapping API", () => {
   it("lists seeded roles", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     const response = await app.inject({ method: "GET", url: "/roles" });
     await app.close();
 
@@ -58,7 +58,7 @@ describe("profile mapping API", () => {
   });
 
   it("ingests a profile, runs inference, and returns current mapping", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     const response = await app.inject({
       method: "POST",
       url: "/profiles",
@@ -74,7 +74,7 @@ describe("profile mapping API", () => {
   });
 
   it("re-runs manual inference without changing mapping shape", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     await app.inject({ method: "POST", url: "/profiles", payload: profile("usr_002") });
     const response = await app.inject({ method: "POST", url: "/profiles/usr_002/infer" });
     await app.close();
@@ -87,7 +87,7 @@ describe("profile mapping API", () => {
   });
 
   it("returns 404 for a missing mapping", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     const response = await app.inject({ method: "GET", url: "/profiles/missing/mapping" });
     await app.close();
 
@@ -95,7 +95,7 @@ describe("profile mapping API", () => {
   });
 
   it("pins selected role with override and resets back to inferred mode", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     await app.inject({ method: "POST", url: "/profiles", payload: profile("usr_007") });
 
     const overrideResponse = await app.inject({
@@ -125,7 +125,7 @@ describe("profile mapping API", () => {
   });
 
   it("keeps source overridden while manual inference updates latestInference", async () => {
-    const app = buildApp();
+    const app = buildApp({ logger: false });
     await app.inject({ method: "POST", url: "/profiles", payload: profile("usr_007") });
     await app.inject({
       method: "POST",

@@ -11,7 +11,7 @@
     "db:migrate": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
     "db:deploy": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
     "db:seed": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/seed.ts",
-    "demo": "tsx src/demo/demo.ts"
+    "demo": "NODE_NO_WARNINGS=1 tsx src/demo/demo.ts"
   },
   "dependencies": {
     "@prisma/client": "6.8.2",

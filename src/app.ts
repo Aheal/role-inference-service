@@ -1,9 +1,13 @@
 import Fastify from "fastify";
 import { registerRoutes } from "./modules/routes.js";
 
-export function buildApp() {
+interface BuildAppOptions {
+  logger?: boolean;
+}
+
+export function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify({
-    logger: true
+    logger: options.logger ?? true
   });
 
   app.get("/health", async () => ({
