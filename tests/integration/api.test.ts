@@ -93,4 +93,68 @@ describe("profile mapping API", () => {
 
     expect(response.statusCode).toBe(404);
   });
+
+  it("pins selected role with override and resets back to inferred mode", async () => {
+    const app = buildApp();
+    await app.inject({ method: "POST", url: "/profiles", payload: profile("usr_007") });
+
+    const overrideResponse = await app.inject({
+      method: "POST",
+      url: "/profiles/usr_007/override",
+      payload: {
+        roleId: "role_005",
+        reason: "Admin reviewed Priya as individual contributor.",
+        overriddenBy: "reviewer@example.com"
+      }
+    });
+    const overrideMapping = overrideResponse.json();
+
+    expect(overrideResponse.statusCode).toBe(200);
+    expect(overrideMapping.source).toBe("overridden");
+    expect(overrideMapping.selectedRole.roleId).toBe("role_005");
+    expect(overrideMapping.activeOverride.reason).toContain("Admin reviewed");
+
+    const resetResponse = await app.inject({ method: "POST", url: "/profiles/usr_007/reset" });
+    const resetMapping = resetResponse.json();
+    await app.close();
+
+    expect(resetResponse.statusCode).toBe(200);
+    expect(resetMapping.source).toBe("inferred");
+    expect(resetMapping.activeOverride).toBeNull();
+    expect(resetMapping.latestInference.status).toBe("needs_review");
+  });
+
+  it("keeps source overridden while manual inference updates latestInference", async () => {
+    const app = buildApp();
+    await app.inject({ method: "POST", url: "/profiles", payload: profile("usr_007") });
+    await app.inject({
+      method: "POST",
+      url: "/profiles/usr_007/override",
+      payload: {
+        roleId: "role_005",
+        reason: "Temporary admin pin.",
+        overriddenBy: "admin"
+      }
+    });
+
+    await app.inject({
+      method: "POST",
+      url: "/profiles",
+      payload: {
+        ...profile("usr_007"),
+        title: "Platform Engineer II",
+        department: "Infrastructure",
+        skills: ["Kubernetes", "Terraform"]
+      }
+    });
+
+    const response = await app.inject({ method: "POST", url: "/profiles/usr_007/infer" });
+    const mapping = response.json();
+    await app.close();
+
+    expect(response.statusCode).toBe(200);
+    expect(mapping.source).toBe("overridden");
+    expect(mapping.selectedRole.roleId).toBe("role_005");
+    expect(mapping.latestInference.inferredRoleId).toBe("role_006");
+  });
 });

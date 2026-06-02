@@ -1,6 +1,14 @@
 import type { FastifyInstance } from "fastify";
 import { ZodError } from "zod";
-import { ingestProfile, listProfiles, listRoles, rerunInference, resolveCurrentMapping } from "./mapping-service.js";
+import {
+  ingestProfile,
+  listProfiles,
+  listRoles,
+  overrideMapping,
+  rerunInference,
+  resetMapping,
+  resolveCurrentMapping
+} from "./mapping-service.js";
 
 export async function registerRoutes(app: FastifyInstance) {
   app.get("/roles", async () => listRoles());
@@ -30,6 +38,22 @@ export async function registerRoutes(app: FastifyInstance) {
       return handleError(reply, error);
     }
   });
+
+  app.post<{ Params: { id: string } }>("/profiles/:id/override", async (request, reply) => {
+    try {
+      return await overrideMapping(request.params.id, request.body);
+    } catch (error) {
+      return handleError(reply, error);
+    }
+  });
+
+  app.post<{ Params: { id: string } }>("/profiles/:id/reset", async (request, reply) => {
+    try {
+      return await resetMapping(request.params.id);
+    } catch (error) {
+      return handleError(reply, error);
+    }
+  });
 }
 
 function handleError(reply: { code: (statusCode: number) => { send: (payload: unknown) => unknown } }, error: unknown) {
@@ -49,4 +73,3 @@ function handleError(reply: { code: (statusCode: number) => { send: (payload: un
 
   throw error;
 }
-

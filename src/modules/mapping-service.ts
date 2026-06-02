@@ -1,6 +1,6 @@
 import type { UserProfile } from "@prisma/client";
 import type { CurrentMapping, InferenceResult, SsoProfile } from "../shared/types.js";
-import { ssoProfileSchema } from "../shared/schemas.js";
+import { overrideRequestSchema, ssoProfileSchema } from "../shared/schemas.js";
 import { inferRole } from "../domain/inference-engine.js";
 import { normalizeProfile } from "../domain/profile-normalizer.js";
 import { prisma } from "../db/prisma.js";
@@ -78,6 +78,43 @@ export async function resolveCurrentMapping(externalUserId: string): Promise<Cur
   };
 }
 
+export async function overrideMapping(externalUserId: string, input: unknown): Promise<CurrentMapping> {
+  const request = overrideRequestSchema.parse(input);
+  const userProfile = await findProfileOrThrow(externalUserId);
+  const role = await prisma.role.findUnique({ where: { roleId: request.roleId } });
+
+  if (!role) {
+    throw new Error(`Role ${request.roleId} not found`);
+  }
+
+  await prisma.roleOverride.updateMany({
+    where: { userProfileId: userProfile.id, deletedAt: null },
+    data: { deletedAt: new Date() }
+  });
+
+  await prisma.roleOverride.create({
+    data: {
+      userProfileId: userProfile.id,
+      roleId: request.roleId,
+      reason: request.reason,
+      overriddenBy: request.overriddenBy
+    }
+  });
+
+  return resolveCurrentMapping(externalUserId);
+}
+
+export async function resetMapping(externalUserId: string): Promise<CurrentMapping> {
+  const userProfile = await findProfileOrThrow(externalUserId);
+
+  await prisma.roleOverride.updateMany({
+    where: { userProfileId: userProfile.id, deletedAt: null },
+    data: { deletedAt: new Date() }
+  });
+
+  return rerunInference(externalUserId);
+}
+
 async function upsertProfile(
   profile: SsoProfile,
   inference: InferenceResult,
@@ -138,4 +175,3 @@ async function findActiveOverride(userProfileId: string) {
     include: { role: true }
   });
 }
-
