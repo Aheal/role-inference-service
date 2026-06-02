@@ -14,6 +14,16 @@ Canonical Work Architecture roles matter because downstream product behavior dep
 
 The primary risk is not UI polish; it is whether the system makes role decisions transparently and safely. The backend owns inference correctness, confidence calibration, explanation quality, override behavior, persistence, and API contracts. I prioritized domain/API quality first so another engineer can understand, test, and extend the inference workflow asynchronously before investing in a more polished UI.
 
+## Prerequisites
+
+- Node.js 22+
+- npm
+- Docker and Docker Compose
+- Git
+- A browser for the optional admin UI
+
+No external database is required. SQLite runs locally and is persisted through a Docker named volume when using Compose. Node 22 is required because the local SQLite migration helper uses `node:sqlite`.
+
 ## Quick Start
 
 ```bash
