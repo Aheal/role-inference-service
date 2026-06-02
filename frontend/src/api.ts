@@ -1,12 +1,14 @@
-import type { CurrentMapping, Role, SsoProfile, StoredProfile } from "./types";
+import type { CurrentMapping, Role, SsoProfile, StoredProfile } from "./types.js";
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const headers = new Headers(options.headers);
+  if (options.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
   const response = await fetch(path, {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers
-    },
-    ...options
+    ...options,
+    headers
   });
 
   if (!response.ok) {
@@ -47,4 +49,3 @@ export function resetMapping(userId: string) {
     method: "POST"
   });
 }
-

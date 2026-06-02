@@ -1,4 +1,4 @@
-import type { SsoProfile } from "./types";
+import type { SsoProfile } from "./types.js";
 
 export const sampleProfiles: SsoProfile[] = [
   {
@@ -83,4 +83,3 @@ export const sampleProfiles: SsoProfile[] = [
     location: "Stockholm"
   }
 ];
-

@@ -7,9 +7,9 @@ import {
   ingestProfile,
   overrideMapping,
   resetMapping
-} from "./api";
-import { sampleProfiles } from "./sampleProfiles";
-import type { CurrentMapping, MappingRow, Role, StoredProfile } from "./types";
+} from "./api.js";
+import { sampleProfiles } from "./sampleProfiles.js";
+import type { CurrentMapping, MappingRow, Role, StoredProfile } from "./types.js";
 import "./styles.css";
 
 function App() {
