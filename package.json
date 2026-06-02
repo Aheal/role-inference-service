@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc",
-    "start": "node dist/main.js",
+    "start": "node dist/src/main.js",
     "test": "vitest run",
     "db:migrate": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
     "db:deploy": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
