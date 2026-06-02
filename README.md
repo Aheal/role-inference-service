@@ -2,7 +2,17 @@
 
 Maps messy SSO user profiles to canonical Work Architecture roles with deterministic inference, confidence scoring, explanations, persisted state, and admin override/reset support.
 
-This is backend-first because the assignment’s core risk is inference behavior, data modeling, auditability, and async handoff. The admin surface is a CLI demo over the API behavior; a polished UI is intentionally deferred.
+This is backend-first because the assignment’s core risk is inference behavior, data modeling, auditability, and async handoff. The CLI demo and minimal React UI sit on top of the same API behavior.
+
+## Business Problem
+
+Enterprise SSO profiles are useful but messy. Okta, Microsoft Entra ID, and Google Workspace often return partial or inconsistent attributes because each company names jobs, departments, groups, and skills differently. The same role might appear as `Sr BI Analyst`, `Senior Analytics Specialist`, or `Data & Insights Analyst`, while generic titles like `Lead` or `Analyst` may hide very different responsibilities.
+
+Canonical Work Architecture roles matter because downstream product behavior depends on them: feature access, recommended workflows, content, reporting, and AI assistant behavior can all change based on a user's role. Because the source data is noisy, the system must explain its reasoning, expose confidence, show alternatives, and allow an admin to override or reset mappings when human context beats automatic inference.
+
+## Why Backend First?
+
+The primary risk is not UI polish; it is whether the system makes role decisions transparently and safely. The backend owns inference correctness, confidence calibration, explanation quality, override behavior, persistence, and API contracts. I prioritized domain/API quality first so another engineer can understand, test, and extend the inference workflow asynchronously before investing in a more polished UI.
 
 ## Quick Start
 
@@ -55,7 +65,7 @@ Expected hard-case behavior:
 - `usr_007`: `needs_review`
 - `usr_008`: `insufficient_data`
 
-## Minimal Admin UI
+## Admin Experience
 
 The root route `/` serves a small React admin experience. It is intentionally thin:
 
@@ -66,6 +76,15 @@ The root route `/` serves a small React admin experience. It is intentionally th
 - supports reset through `POST /profiles/:id/reset`
 
 The UI contains no inference, scoring, confidence, or persistence logic.
+
+Screenshot placeholders for review handoff:
+
+- Mapping Dashboard: `docs/screenshots/mapping-dashboard.png`
+- Profile Details: `docs/screenshots/profile-details.png`
+- Override Workflow: `docs/screenshots/override-workflow.png`
+- Reset Workflow: `docs/screenshots/reset-workflow.png`
+
+The dashboard table shows user, selected role, source, status, and confidence. Selecting a profile opens details with explanation, signals, conflicts, alternatives, and active override information. Override submits to `POST /profiles/:id/override`; reset submits to `POST /profiles/:id/reset`; both refresh the selected mapping after success.
 
 ## API
 
@@ -82,16 +101,39 @@ The UI contains no inference, scoring, confidence, or persistence logic.
 
 ## Architecture
 
-```txt
-SSO profile
-  -> validate with Zod
-  -> upsert profile
-  -> normalize signals
-  -> score every role
-  -> rank candidates
-  -> calculate confidence
-  -> persist inference
-  -> resolve mapping
+### Architecture Overview
+
+```mermaid
+flowchart LR
+  A["SSO Profile"] --> B["Validation"]
+  B --> C["Profile Normalizer"]
+  C --> D["Inference Engine"]
+  D --> E["Role Ranking"]
+  E --> F["Confidence Calculation"]
+  F --> G["Mapping Resolver"]
+  G --> H["API / CLI / UI"]
+```
+
+### Override Flow
+
+```mermaid
+flowchart TD
+  A["Profile Update"] --> B["Check Active Override"]
+  B --> C{"Override Exists?"}
+  C -- "Yes" --> D["Keep Override"]
+  C -- "No" --> E["Run Inference"]
+  D --> F["Return Mapping"]
+  E --> F
+```
+
+### Confidence Model
+
+```mermaid
+flowchart LR
+  A["Weighted Score"] --> E["Confidence"]
+  B["Candidate Margin"] --> E
+  C["Data Completeness"] --> E
+  D["Conflict Penalties"] -- "subtract" --> E
 ```
 
 Core boundaries:
@@ -200,7 +242,7 @@ Token/context strategy:
 - Admin overrides are intentional and suppress automatic selected-role changes.
 - Synchronous re-inference is enough for this take-home.
 - Confidence must be explainable, not statistically perfect.
-- CLI demo is sufficient admin surface for the assignment scope.
+- CLI demo plus minimal React UI are sufficient admin surfaces for the assignment scope.
 
 ## Known Limitations
 
@@ -211,7 +253,7 @@ Token/context strategy:
 - No OpenAPI spec.
 - SQLite is local-only.
 - Scoring weights are heuristic and need calibration against labeled data.
-- Minimal UI was delayed to protect backend quality, tests, and walkthrough clarity.
+- Minimal UI is intentionally thin and API-only.
 
 ## What I Would Build Next
 
