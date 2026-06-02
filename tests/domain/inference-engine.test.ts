@@ -12,6 +12,25 @@ function profile(userId: string) {
 }
 
 describe("inferRole", () => {
+  it("handles every assignment sample profile", () => {
+    const expectations = new Map([
+      ["usr_001", "inferred"],
+      ["usr_002", "inferred"],
+      ["usr_003", "needs_review"],
+      ["usr_004", "needs_review"],
+      ["usr_005", "inferred"],
+      ["usr_006", "needs_review"],
+      ["usr_007", "needs_review"],
+      ["usr_008", "insufficient_data"]
+    ]);
+
+    for (const sampleProfile of sampleProfiles) {
+      const result = inferRole(sampleProfile, workArchitectureRoles);
+      expect(result.status, sampleProfile.userId).toBe(expectations.get(sampleProfile.userId));
+      expect(result.explanation.length, sampleProfile.userId).toBeGreaterThan(0);
+    }
+  });
+
   it("maps usr_001 to Senior Data Analyst with high confidence", () => {
     const result = inferRole(profile("usr_001"), workArchitectureRoles);
 
