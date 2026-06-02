@@ -26,11 +26,14 @@ No external database is required. SQLite runs locally and is persisted through a
 
 ## Quick Start
 
+Production-style local run, including the built React admin UI at `http://localhost:3000/`:
+
 ```bash
 npm install
 npm run db:migrate
 npm run db:seed
-npm run dev
+npm run build
+npm start
 ```
 
 Health check:
@@ -51,10 +54,26 @@ Run the walkthrough demo:
 npm run demo
 ```
 
-Open the minimal admin UI:
+Open the minimal admin UI after `npm run build`:
 
 ```txt
 http://localhost:3000/
+```
+
+For active frontend development, run the API and Vite UI in separate terminals:
+
+```bash
+npm run dev
+```
+
+```bash
+npm run dev:ui
+```
+
+Then open:
+
+```txt
+http://localhost:5173/
 ```
 
 ## Docker

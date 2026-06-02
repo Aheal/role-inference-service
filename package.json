@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc && tsc -p frontend/tsconfig.json && vite build --config frontend/vite.config.ts",
+    "dev:ui": "vite --config frontend/vite.config.ts --host 0.0.0.0",
+    "build": "tsc && tsc -p frontend/tsconfig.json && npm run build:ui",
+    "build:ui": "vite build --config frontend/vite.config.ts",
     "start": "node dist/src/main.js",
     "test": "vitest run",
     "db:migrate": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
