@@ -1,0 +1,31 @@
+{
+  "name": "role-inference-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "test": "vitest run",
+    "db:migrate": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} prisma migrate dev",
+    "db:deploy": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} prisma migrate deploy",
+    "db:seed": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/seed.ts",
+    "demo": "tsx src/demo/demo.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "fastify": "^5.3.3",
+    "zod": "^3.25.48"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "prisma": "^6.8.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

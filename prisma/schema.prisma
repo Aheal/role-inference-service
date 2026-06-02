@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  roleId             String          @id
+  roleName           String
+  department         String
+  jobFamily          String
+  seniority          String
+  skills             Json
+  keywords           Json
+  roleDatasetVersion String
+  inferences         RoleInference[]
+  overrides          RoleOverride[]
+}
+
+model UserProfile {
+  id                   String          @id @default(cuid())
+  externalUserId       String          @unique
+  displayName          String
+  rawPayload           Json
+  normalizedTitle      String?
+  normalizedDepartment String?
+  normalizedSkills     Json
+  inputHash            String
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  inferences           RoleInference[]
+  overrides            RoleOverride[]
+}
+
+model RoleInference {
+  id                 String      @id @default(cuid())
+  userProfileId      String
+  inferredRoleId     String?
+  confidence         Float
+  status             String
+  explanation        String
+  signals            Json
+  conflictSignals    Json
+  alternatives       Json
+  modelVersion       String
+  roleDatasetVersion String
+  inputHash          String
+  staleReason        String?
+  createdAt          DateTime    @default(now())
+  userProfile        UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  inferredRole       Role?       @relation(fields: [inferredRoleId], references: [roleId])
+}
+
+model RoleOverride {
+  id            String      @id @default(cuid())
+  userProfileId String
+  roleId        String
+  reason        String
+  overriddenBy  String
+  createdAt     DateTime    @default(now())
+  deletedAt     DateTime?
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  role          Role        @relation(fields: [roleId], references: [roleId])
+
+  @@index([userProfileId, deletedAt])
+}
+

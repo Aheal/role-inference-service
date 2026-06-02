@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.git
+.agents
+skills-lock.json
+prisma/dev.db
+prisma/dev.db-journal
+.env
+
