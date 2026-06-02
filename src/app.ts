@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { registerRoutes } from "./modules/routes.js";
+import { registerUiRoutes } from "./ui/routes.js";
 
 interface BuildAppOptions {
   logger?: boolean;
@@ -15,6 +16,7 @@ export function buildApp(options: BuildAppOptions = {}) {
   }));
 
   app.register(registerRoutes);
+  app.register(registerUiRoutes);
 
   return app;
 }

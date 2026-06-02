@@ -159,7 +159,7 @@ Overrides do not delete inference results. They pin the selected role while pres
 
 ## Minimal Admin Surface
 
-The first admin surface is a CLI demo:
+The primary walkthrough surface is a CLI demo:
 
 ```bash
 npm run demo
@@ -175,7 +175,7 @@ The demo should:
 6. Reset the user.
 7. Show `source = inferred`.
 
-A small UI can be added later to visualize the same API behavior.
+A small React UI is served at `/` to visualize the same API behavior. It consumes existing endpoints only and contains no inference logic.
 
 ## Known Limitations
 

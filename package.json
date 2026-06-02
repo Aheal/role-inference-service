@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc",
+    "build": "tsc && tsc -p frontend/tsconfig.json && vite build --config frontend/vite.config.ts",
     "start": "node dist/src/main.js",
     "test": "vitest run",
     "db:migrate": "DATABASE_URL=${DATABASE_URL:-file:./dev.db} tsx prisma/apply-migration.ts",
@@ -16,13 +16,19 @@
   "dependencies": {
     "@prisma/client": "6.8.2",
     "fastify": "^5.3.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "zod": "^3.25.48"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
     "prisma": "6.8.2",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
+    "vite": "^8.0.16",
     "vitest": "^4.1.8"
   },
   "prisma": {

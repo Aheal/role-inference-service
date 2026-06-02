@@ -47,6 +47,15 @@ beforeEach(async () => {
 });
 
 describe("profile mapping API", () => {
+  it("serves the minimal admin UI at root", async () => {
+    const app = buildApp({ logger: false });
+    const response = await app.inject({ method: "GET", url: "/" });
+    await app.close();
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toContain("Admin");
+  });
+
   it("lists seeded roles", async () => {
     const app = buildApp({ logger: false });
     const response = await app.inject({ method: "GET", url: "/roles" });

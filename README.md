@@ -31,6 +31,12 @@ Run the walkthrough demo:
 npm run demo
 ```
 
+Open the minimal admin UI:
+
+```txt
+http://localhost:3000/
+```
+
 ## Docker
 
 ```bash
@@ -48,6 +54,18 @@ Expected hard-case behavior:
 - `usr_006`: `needs_review`
 - `usr_007`: `needs_review`
 - `usr_008`: `insufficient_data`
+
+## Minimal Admin UI
+
+The root route `/` serves a small React admin experience. It is intentionally thin:
+
+- loads roles and profiles through existing API endpoints
+- bootstraps assignment sample profiles with `POST /profiles` only when no profiles exist
+- shows selected role, source, status, confidence, explanation, signals, conflicts, and alternatives
+- supports override through `POST /profiles/:id/override`
+- supports reset through `POST /profiles/:id/reset`
+
+The UI contains no inference, scoring, confidence, or persistence logic.
 
 ## API
 

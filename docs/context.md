@@ -59,6 +59,7 @@ SSO profile -> ingest/upsert -> normalize -> infer automatically unless overridd
 - Reset workflow
 - Persistence
 - CLI demo
+- Minimal admin UI
 
 ## Out of Scope
 
