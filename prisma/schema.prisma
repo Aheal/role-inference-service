@@ -13,8 +13,8 @@ model Role {
   department         String
   jobFamily          String
   seniority          String
-  skills             Json
-  keywords           Json
+  skills             String
+  keywords           String
   roleDatasetVersion String
   inferences         RoleInference[]
   overrides          RoleOverride[]
@@ -24,10 +24,10 @@ model UserProfile {
   id                   String          @id @default(cuid())
   externalUserId       String          @unique
   displayName          String
-  rawPayload           Json
+  rawPayload           String
   normalizedTitle      String?
   normalizedDepartment String?
-  normalizedSkills     Json
+  normalizedSkills     String
   inputHash            String
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
@@ -42,9 +42,9 @@ model RoleInference {
   confidence         Float
   status             String
   explanation        String
-  signals            Json
-  conflictSignals    Json
-  alternatives       Json
+  signals            String
+  conflictSignals    String
+  alternatives       String
   modelVersion       String
   roleDatasetVersion String
   inputHash          String
@@ -67,4 +67,3 @@ model RoleOverride {
 
   @@index([userProfileId, deletedAt])
 }
-
