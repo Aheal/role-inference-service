@@ -94,6 +94,18 @@ Expected hard-case behavior:
 - `usr_007`: `needs_review`
 - `usr_008`: `insufficient_data`
 
+## Reviewer Flow
+
+For a quick review:
+
+1. Run `docker compose up --build`.
+2. Open `http://localhost:3000/`.
+3. Inspect `usr_006` to see a vague profile marked `needs_review`.
+4. Inspect `usr_007` to see ambiguity between Engineering scope and Data/ML skills.
+5. Apply an override and confirm source becomes `overridden`.
+6. Reset and confirm source returns to `inferred`.
+7. Run `npm run demo` for the same workflow as a terminal walkthrough.
+
 ## Admin Experience
 
 The root route `/` serves a small React admin experience. It is intentionally thin:
@@ -276,6 +288,8 @@ npm test
 ## AI Usage
 
 AI tools were used as engineering accelerators, not as the runtime classifier.
+
+No runtime LLM is called or mocked in this version. That is intentional: role selection is deterministic so confidence, alternatives, and explanations can be tested and audited. A future version could use optional LLM-assisted synonym enrichment or explanation refinement, but not LLM-based role selection.
 
 Used for:
 
