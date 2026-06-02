@@ -110,20 +110,22 @@ flowchart LR
   C --> D["Inference Engine"]
   D --> E["Role Ranking"]
   E --> F["Confidence Calculation"]
-  F --> G["Mapping Resolver"]
-  G --> H["API / CLI / UI"]
+  F --> G["Persist Inference"]
+  G --> H["Mapping Resolver"]
+  H --> I["API / CLI / UI"]
 ```
 
 ### Override Flow
 
 ```mermaid
 flowchart TD
-  A["Profile Update"] --> B["Check Active Override"]
-  B --> C{"Override Exists?"}
-  C -- "Yes" --> D["Keep Override"]
-  C -- "No" --> E["Run Inference"]
-  D --> F["Return Mapping"]
-  E --> F
+  A["Profile Update"] --> B["Validate and Upsert Profile"]
+  B --> C["Check Active Override"]
+  C --> D{"Override Exists?"}
+  D -- "Yes" --> E["Keep Override"]
+  D -- "No" --> F["Run and Persist Inference"]
+  E --> G["Return Mapping"]
+  F --> G
 ```
 
 ### Confidence Model
@@ -132,8 +134,44 @@ flowchart TD
 flowchart LR
   A["Weighted Score"] --> E["Confidence"]
   B["Candidate Margin"] --> E
-  C["Data Completeness"] --> E
+  C["Data Completeness Adjustment"] --> E
   D["Conflict Penalties"] -- "subtract" --> E
+```
+
+### Domain Model
+
+```mermaid
+erDiagram
+  UserProfile ||--o{ RoleInference : generates
+  UserProfile ||--o{ RoleOverride : has
+  RoleInference }o--|| Role : selects
+  RoleOverride }o--|| Role : pins
+
+  UserProfile {
+    string externalUserId
+    string displayName
+    string inputHash
+  }
+
+  Role {
+    string roleId
+    string roleName
+    string department
+    string jobFamily
+  }
+
+  RoleInference {
+    string status
+    float confidence
+    string modelVersion
+    string inputHash
+  }
+
+  RoleOverride {
+    string reason
+    string overriddenBy
+    datetime deletedAt
+  }
 ```
 
 Core boundaries:
@@ -234,6 +272,10 @@ Token/context strategy:
 - Review checkpoints were added before moving between phases.
 - Highest-context phases were contracts/architecture, inference calibration, and final review.
 - Lower-token improvement if repeated: keep shorter agent prompts in repo-local docs and avoid reloading the PDF after contracts are established.
+
+### Human Ownership
+
+AI accelerated planning, implementation, review, testing, and documentation. Final ownership of architecture decisions, scoring strategy, confidence calibration, tradeoffs, and scope remained with the engineer. AI suggestions were reviewed before use and rejected when they added unnecessary complexity or weakened the deterministic inference design.
 
 ## Assumptions
 
